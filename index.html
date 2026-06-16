@@ -3,359 +3,191 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>EXPEDIENTE CLASIFICADO</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<title>Para Elisabeth</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: #0a0a0a; min-height: 100vh; }
-  #app {
-    background: #0a0a0a;
-    min-height: 100vh;
-    font-family: 'Share Tech Mono', monospace;
-    color: #00ff41;
-    overflow-x: hidden;
-    max-width: 480px;
-    margin: 0 auto;
-  }
-  .screen { display: none; padding: 1.5rem 1.2rem; min-height: 100vh; flex-direction: column; }
-  .screen.active { display: flex; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100vh;background:#0d0d0d}
+  #app{min-height:100vh;background:#0d0d0d;font-family:'Montserrat',sans-serif;color:#e8dcc8;overflow-x:hidden;max-width:480px;margin:0 auto}
+  .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;padding:2rem 1.4rem}
+  .screen.active{display:flex}
+  .gold-line{width:60px;height:1px;background:#c9a84c;margin:1rem auto}
+  .gold-line-full{width:100%;height:1px;background:linear-gradient(to right,transparent,#c9a84c,transparent);margin:1.2rem 0}
+  .blink{animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
+  .fade-in{animation:fadeIn 0.8s ease forwards}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .hidden{display:none}
 
-  .stamp {
-    border: 3px solid #ff0000;
-    color: #ff0000;
-    font-size: 22px;
-    font-weight: 900;
-    text-align: center;
-    padding: 6px 12px;
-    letter-spacing: 6px;
-    transform: rotate(-8deg);
-    margin: 0 auto 1.5rem;
-    width: fit-content;
-    opacity: 0.9;
-  }
-  .doc-header {
-    border: 1px solid #00ff41;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    position: relative;
-  }
-  .doc-header::before {
-    content: '';
-    position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
-    border: 1px solid #00ff4133;
-    pointer-events: none;
-  }
-  .doc-title { font-size: 11px; color: #00ff4199; margin-bottom: 4px; }
-  .blink { animation: blink 1s step-end infinite; }
-  @keyframes blink { 50% { opacity: 0; } }
-  .scan-line {
-    width: 100%; height: 2px;
-    background: linear-gradient(to right, transparent, #00ff4155, #00ff41, #00ff4155, transparent);
-    animation: scan 2s linear infinite;
-    margin: 1rem 0;
-  }
-  @keyframes scan { 0%{opacity:0.3} 50%{opacity:1} 100%{opacity:0.3} }
-  .btn-primary {
-    background: transparent;
-    border: 1px solid #00ff41;
-    color: #00ff41;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 13px;
-    padding: 14px 20px;
-    cursor: pointer;
-    width: 100%;
-    margin-top: 1rem;
-    letter-spacing: 2px;
-    transition: all 0.2s;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .btn-primary:active { background: #00ff4122; }
-  .field-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 12px; }
-  .field-label { color: #00ff4166; }
-  .field-val { color: #00ff41; }
-  .redacted { background: #00ff41; color: #00ff41; padding: 0 4px; user-select: none; }
+  /* SOBRE */
+  .envelope-wrap{width:100%;max-width:320px;margin:2rem auto;cursor:pointer}
+  .envelope-body{background:#1a1410;border:1px solid #c9a84c44;padding:2rem 1.5rem 1.5rem;position:relative;text-align:center}
+  .envelope-body::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:160px solid transparent;border-right:160px solid transparent;border-top:90px solid #0d0d0d;transition:border-top-color 0.5s}
+  .envelope-body.open::before{border-top-color:#1a1410}
+  .wax-seal{width:52px;height:52px;border-radius:50%;background:#8B0000;border:2px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:#c9a84c;margin:0.5rem auto 1.5rem;position:relative;z-index:2;box-shadow:0 0 0 4px #1a1410;transition:transform 0.3s}
+  .envelope-body:hover .wax-seal{transform:scale(1.08)}
+  .env-label{font-size:10px;letter-spacing:3px;color:#c9a84c99;text-transform:uppercase;margin-bottom:0.5rem}
+  .env-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:#e8dcc8;line-height:1.2}
 
-  .mission-tag {
-    font-size: 10px; color: #ff000099; border: 1px solid #ff000044;
-    padding: 2px 8px; display: inline-block; margin-bottom: 1rem;
-    letter-spacing: 3px;
-  }
-  .question-box {
-    border: 1px solid #00ff4144;
-    padding: 1rem;
-    margin: 1rem 0;
-    background: #00ff410a;
-    font-size: 13px;
-    line-height: 1.6;
-    color: #00ff41cc;
-  }
-  .question-num { color: #ff0000; font-size: 11px; margin-bottom: 8px; letter-spacing: 2px; }
-  .option {
-    display: block; width: 100%;
-    background: transparent; border: 1px solid #00ff4133;
-    color: #00ff4199; font-family: 'Share Tech Mono', monospace;
-    font-size: 12px; padding: 12px 14px; margin: 8px 0;
-    cursor: pointer; text-align: left; transition: all 0.2s;
-    letter-spacing: 1px;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .option:active { background: #00ff410f; }
-  .option.correct { border-color: #00ff41; background: #00ff4122; color: #00ff41; }
-  .option.wrong { border-color: #ff0000; background: #ff000022; color: #ff000099; }
-  .progress-bar { height: 2px; background: #00ff4122; margin: 1rem 0; }
-  .progress-fill { height: 100%; background: #00ff41; transition: width 0.5s; }
+  /* QUIZ */
+  .quiz-header{text-align:center;margin-bottom:1.5rem;width:100%}
+  .quiz-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#e8dcc8;margin-bottom:0.3rem}
+  .quiz-sub{font-size:10px;letter-spacing:3px;color:#c9a84c;text-transform:uppercase}
+  .progress-dots{display:flex;gap:8px;justify-content:center;margin:1rem 0}
+  .dot{width:6px;height:6px;border-radius:50%;background:#c9a84c22;border:1px solid #c9a84c44;transition:all 0.4s}
+  .dot.done{background:#c9a84c}
+  .q-card{width:100%;background:#1a1410;border:1px solid #c9a84c33;padding:1.5rem;margin:0.5rem 0}
+  .q-num{font-size:10px;letter-spacing:3px;color:#c9a84c88;margin-bottom:0.8rem;text-transform:uppercase}
+  .q-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:#e8dcc8;line-height:1.5;margin-bottom:1.2rem}
+  .opt{display:block;width:100%;background:transparent;border:1px solid #c9a84c22;color:#c9a84c88;font-family:'Montserrat',sans-serif;font-size:11px;padding:12px 16px;margin:6px 0;cursor:pointer;text-align:left;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+  .opt:active,.opt:hover{border-color:#c9a84c66;color:#e8dcc8}
+  .opt.correct{border-color:#c9a84c;background:#c9a84c11;color:#c9a84c}
+  .opt.wrong{border-color:#8B000066;background:#8B000011;color:#8B000099}
+  .feedback{font-size:11px;letter-spacing:2px;min-height:20px;margin-top:8px;text-align:center}
 
-  #reveal-screen { background: #000; }
-  .reveal-header { font-size: 11px; color: #ff0000; letter-spacing: 3px; margin-bottom: 1rem; }
-  .img-container {
-    width: 100%; aspect-ratio: 16/9;
-    position: relative; overflow: hidden;
-    border: 1px solid #00ff4133;
-    margin: 0.5rem 0;
-    background: #111;
-  }
-  canvas.pixel-canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
-  .img-label { font-size: 10px; color: #00ff4166; letter-spacing: 2px; margin-bottom: 4px; margin-top: 1rem; }
-  .destination-name {
-    font-size: 22px; color: #00ff41;
-    letter-spacing: 4px; margin: 0.4rem 0;
-    animation: glitch 3s infinite;
-  }
-  @keyframes glitch {
-    0%,90%,100%{text-shadow:none}
-    92%{text-shadow:2px 0 #ff0000,-2px 0 #0000ff}
-    94%{text-shadow:-2px 0 #ff0000,2px 0 #0000ff}
-    96%{text-shadow:none}
-  }
-  .coords { font-size: 11px; color: #00ff4166; margin-bottom: 0.5rem; }
-  .final-msg {
-    border: 1px solid #ff0000;
-    padding: 1.2rem; margin: 1.5rem 0 2rem;
-    font-size: 13px; color: #ff0000;
-    line-height: 1.8; text-align: center;
-    animation: borderPulse 2s ease-in-out infinite;
-  }
-  @keyframes borderPulse { 50% { border-color: #ff000044; color: #ff000099; } }
-  .hidden { display: none; }
+  /* PISTA */
+  .clue-card{width:100%;background:#1a1410;border:1px solid #c9a84c44;padding:2rem 1.5rem;text-align:center;margin-top:1rem}
+  .clue-icon{font-size:32px;margin-bottom:1rem}
+  .clue-label{font-size:9px;letter-spacing:4px;color:#c9a84c;text-transform:uppercase;margin-bottom:1rem}
+  .clue-coords{font-family:'Cormorant Garamond',serif;font-size:28px;color:#e8dcc8;letter-spacing:4px;margin:0.8rem 0}
+  .clue-hint{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:#c9a84c88;line-height:1.6;margin:0.8rem 0 1.2rem}
+  .maps-btn{display:block;width:100%;background:transparent;border:1px solid #c9a84c;color:#c9a84c;font-family:'Montserrat',sans-serif;font-size:11px;padding:14px 20px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;text-decoration:none;text-align:center;margin-top:0.5rem;-webkit-tap-highlight-color:transparent}
+  .maps-btn:active{background:#c9a84c11}
 </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- PANTALLA 1: INTRO -->
-  <div id="screen-intro" class="screen active">
-    <br>
-    <div class="stamp">CLASIFICADO</div>
-    <div class="doc-header">
-      <div class="doc-title">OPERACIONES ESPECIALES</div>
-      <div style="font-size:11px;color:#00ff41;margin-bottom:8px">EXPEDIENTE #2025-BDAY-██</div>
-      <div class="scan-line"></div>
-      <div class="field-row">
-        <span class="field-label">DESTINATARIO:</span>
-        <span class="field-val">ELISABETH JORGE GONZALEZ</span>
-      </div>
-      <div class="field-row">
-        <span class="field-label">CLASIFICACIÓN:</span>
-        <span class="field-val">ULTRA SECRETO</span>
-      </div>
-      <div class="field-row">
-        <span class="field-label">MISIÓN:</span>
-        <span class="field-val">CUMPLEAÑOS 🎂</span>
-      </div>
-      <div class="field-row">
-        <span class="field-label">ESTADO:</span>
-        <span class="field-val blink">█ ACTIVO</span>
-      </div>
-      <div class="field-row">
-        <span class="field-label">PATROCINADOR:</span>
-        <span class="field-val"><span class="redacted">DANI</span> (DESCLASIF.)</span>
+  <!-- PANTALLA 1: SOBRE -->
+  <div id="s1" class="screen active">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
+      <p style="font-size:9px;letter-spacing:4px;color:#c9a84c88;text-transform:uppercase;margin-bottom:2rem">Una sorpresa para</p>
+      <div class="envelope-wrap" onclick="openEnvelope()">
+        <div class="envelope-body" id="env">
+          <div class="wax-seal">✦</div>
+          <div class="env-label">Para</div>
+          <div class="env-name">Elisabeth</div>
+          <div class="gold-line"></div>
+          <div style="font-size:10px;color:#c9a84c66;letter-spacing:1px">Con amor, Dani</div>
+          <div class="blink" style="font-size:10px;color:#c9a84c55;letter-spacing:2px;margin-top:1.5rem">✦ toca para abrir ✦</div>
+        </div>
       </div>
     </div>
-    <div style="font-size:11px;color:#00ff4166;line-height:1.8;border-left:2px solid #00ff4133;padding-left:10px;margin-bottom:1.2rem">
-      Este expediente contiene información sobre dos misiones de alto impacto programadas. La información ha sido cifrada por razones de seguridad.<br><br>
-      Para acceder al contenido <span style="color:#ff0000">CLASIFICADO</span>, el agente deberá superar la verificación de identidad.
-    </div>
-    <button class="btn-primary" onclick="showQuiz()">► INICIAR VERIFICACIÓN</button>
   </div>
 
   <!-- PANTALLA 2: QUIZ -->
-  <div id="screen-quiz" class="screen">
-    <div class="mission-tag">VERIFICACIÓN DE IDENTIDAD</div>
-    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
-    <div id="quiz-content"></div>
+  <div id="s2" class="screen">
+    <div class="quiz-header">
+      <div class="gold-line"></div>
+      <div class="quiz-title">¿Nos conocemos?</div>
+      <div class="quiz-sub">Tres preguntas para ti</div>
+      <div class="gold-line"></div>
+      <div class="progress-dots">
+        <div class="dot" id="d0"></div>
+        <div class="dot" id="d1"></div>
+        <div class="dot" id="d2"></div>
+      </div>
+    </div>
+    <div id="qcontent" style="width:100%"></div>
   </div>
 
-  <!-- PANTALLA 3: REVEAL -->
-  <div id="reveal-screen" class="screen">
-    <div class="reveal-header blink">▓ ACCESO CONCEDIDO — DESCIFRANDO...</div>
-
-    <div class="img-label">DESTINO #01 — COORDENADAS: 41°54'N 12°29'E</div>
-    <div class="img-container">
-      <canvas id="c1" class="pixel-canvas"></canvas>
+  <!-- PANTALLA 3: PISTA -->
+  <div id="s3" class="screen">
+    <div style="width:100%;text-align:center;margin-bottom:0.5rem">
+      <div class="gold-line"></div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:4px;color:#c9a84c;text-transform:uppercase">Misión superada</div>
+      <div class="gold-line"></div>
     </div>
-    <div class="destination-name hidden" id="dest1">ROMA, ITALIA</div>
-    <div class="coords hidden" id="co1">El Coliseo · Construido 70–80 d.C. · MISIÓN CONFIRMADA</div>
 
-    <div class="img-label hidden" id="lbl2">DESTINO #02 — COORDENADAS: 41°19'N 19°49'E</div>
-    <div class="img-container hidden" id="c2wrap">
-      <canvas id="c2" class="pixel-canvas"></canvas>
+    <div class="clue-card fade-in">
+      <div class="clue-label">Ahora busca el siguiente QR</div>
+      <div class="gold-line-full"></div>
+
+      <!-- ════════════════════════════════════
+           CAMBIA AQUÍ LAS COORDENADAS
+           Formato: GG°MM'SS.S"N GG°MM'SS.S"W
+           ════════════════════════════════════ -->
+      <div class="clue-coords" id="coords-display">28°27'46"N 16°15'16"W</div>
+
+      <div class="gold-line-full"></div>
+
+      <!-- ════════════════════════════════════
+           CAMBIA AQUÍ EL TEXTO DE LA PISTA
+           ════════════════════════════════════ -->
+      <div class="clue-hint">"Donde los dos nos perdemos<br>entre páginas y café"</div>
+
+      <!-- ════════════════════════════════════
+           CAMBIA AQUÍ LAS COORDENADAS DEL ENLACE
+           Formato: latitud,longitud decimales
+           Ej: 28.4628,-16.2544
+           ════════════════════════════════════ -->
+      <a class="maps-btn" href="https://maps.apple.com/?ll=28.4628,-16.2544&q=Siguiente+QR" target="_blank">
+        ✦ abrir en maps ✦
+      </a>
     </div>
-    <div class="destination-name hidden" id="dest2">ALBANIA</div>
-    <div class="coords hidden" id="co2">Riviera Albanesa · Mar Jónico · MISIÓN CONFIRMADA</div>
 
-    <div class="final-msg hidden" id="final-msg">
-      ✦ FELIZ CUMPLEAÑOS ✦<br><br>
-      Este verano nos espera una aventura.<br>
-      Dos destinos. Un mismo equipo.<br><br>
-      <span style="color:#00ff41">Con todo mi amor 💚</span>
+    <div style="font-size:10px;color:#c9a84c44;letter-spacing:2px;text-align:center;margin-top:1.5rem">
+      El siguiente QR te espera ahí
     </div>
   </div>
 
 </div>
-
 <script>
-/* ── PRECARGAR IMÁGENES ─────────────────────────────── */
-const img1 = new Image();
-const img2 = new Image();
-img1.crossOrigin = 'anonymous';
-img2.crossOrigin = 'anonymous';
-img1.src = './1.jpg';
-img2.src = './2.jpg';
-
-/* ── QUIZ ───────────────────────────────────────────── */
-const questions = [
-  {
-    q: "Para verificar tu identidad, agente: ¿Cuándo conociste a J.D.C.H?",
-    opts: ["02/2024", "02/2021", "02/2023", "01/2021"],
-    correct: 1
-  },
-  {
-    q: "Segunda verificación: ¿Cuál es tu color favorito, agente?",
-    opts: ["Azul", "Rosa", "Morado", "Negro"],
-    correct: 1
-  },
-  {
-    q: "Verificación final: ¿Qué marca es tu vehículo?",
-    opts: ["Renault", "Volkswagen", "Fiat", "Nissan"],
-    correct: 3
-  }
+const questions=[
+  /* ════════════════════════════════════════════════
+     CAMBIA AQUÍ LAS PREGUNTAS, OPCIONES Y correct:
+     correct es el índice (0=A, 1=B, 2=C, 3=D)
+     ════════════════════════════════════════════════ */
+  {q:"¿Cuándo nos conocimos?", opts:["02/2024","02/2021","02/2023","01/2021"], correct:1},
+  {q:"¿Cuál es tu color favorito?", opts:["Azul","Rosa","Morado","Negro"], correct:1},
+  {q:"¿Qué marca es tu coche?", opts:["Renault","Volkswagen","Fiat","Nissan"], correct:3}
 ];
 
-let current = 0;
-let answered = false;
+let cur=0, answered=false;
 
-function showQuiz() {
-  document.getElementById('screen-intro').classList.remove('active');
-  document.getElementById('screen-quiz').classList.add('active');
-  renderQuestion();
+function openEnvelope(){
+  document.getElementById('env').classList.add('open');
+  setTimeout(()=>{
+    document.getElementById('s1').classList.remove('active');
+    document.getElementById('s2').classList.add('active');
+    renderQ();
+  },600);
 }
 
-function renderQuestion() {
-  const q = questions[current];
-  const pct = (current / questions.length) * 100;
-  document.getElementById('progress').style.width = pct + '%';
-  answered = false;
-  document.getElementById('quiz-content').innerHTML = `
-    <div class="question-box">
-      <div class="question-num">PREGUNTA ${current + 1} / ${questions.length}</div>
-      <div style="margin-bottom:14px">${q.q}</div>
-      ${q.opts.map((o, i) => `<button class="option" onclick="answer(${i})">[${String.fromCharCode(65+i)}] ${o}</button>`).join('')}
-    </div>
-    <div id="feedback" style="font-size:12px;min-height:24px;margin-top:6px;color:#00ff4199"></div>
-  `;
+function renderQ(){
+  const q=questions[cur];
+  answered=false;
+  for(let i=0;i<3;i++) document.getElementById('d'+i).classList.toggle('done',i<cur);
+  document.getElementById('qcontent').innerHTML=`
+    <div class="q-card fade-in">
+      <div class="q-num">Pregunta ${cur+1} de ${questions.length}</div>
+      <div class="q-text">${q.q}</div>
+      ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${o}</button>`).join('')}
+      <div class="feedback" id="fb"></div>
+    </div>`;
 }
 
-function answer(idx) {
-  if (answered) return;
-  answered = true;
-  const q = questions[current];
-  const btns = document.querySelectorAll('.option');
-  if (idx === q.correct) {
+function pick(idx){
+  if(answered)return;
+  answered=true;
+  const q=questions[cur];
+  const btns=document.querySelectorAll('.opt');
+  if(idx===q.correct){
     btns[idx].classList.add('correct');
-    document.getElementById('feedback').innerHTML = '<span style="color:#00ff41">✓ VERIFICADO</span>';
-    setTimeout(() => { current++; next(); }, 900);
+    document.getElementById('fb').innerHTML='<span style="color:#c9a84c;letter-spacing:2px">✦ correcto</span>';
+    setTimeout(()=>{cur++;cur<questions.length?renderQ():showClue();},900);
   } else {
     btns[idx].classList.add('wrong');
     btns[q.correct].classList.add('correct');
-    document.getElementById('feedback').innerHTML = '<span style="color:#ff0000">✗ ERROR — Respuesta correcta marcada</span>';
-    setTimeout(() => { current++; next(); }, 1500);
+    document.getElementById('fb').innerHTML='<span style="color:#8B000099;letter-spacing:2px">— así es</span>';
+    setTimeout(()=>{cur++;cur<questions.length?renderQ():showClue();},1500);
   }
 }
 
-function next() {
-  if (current < questions.length) renderQuestion();
-  else showReveal();
-}
-
-function showReveal() {
-  document.getElementById('screen-quiz').classList.remove('active');
-  document.getElementById('reveal-screen').classList.add('active');
-  setTimeout(startPixelReveal, 400);
-}
-
-/* ── PIXEL REVEAL con imágenes reales ──────────────── */
-const W = 320, H = 180;
-
-function renderPixelated(canvas, img, blockSize) {
-  canvas.width  = W;
-  canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  /* Dibujamos la imagen en un canvas auxiliar pequeño y luego la escalamos */
-  const tmp = document.createElement('canvas');
-  const cols = Math.ceil(W / blockSize);
-  const rows = Math.ceil(H / blockSize);
-  tmp.width  = cols;
-  tmp.height = rows;
-  const tCtx = tmp.getContext('2d');
-  tCtx.drawImage(img, 0, 0, cols, rows);
-
-  /* Escalamos de vuelta con pixelado */
-  ctx.imageSmoothingEnabled = false;
-  ctx.drawImage(tmp, 0, 0, cols, rows, 0, 0, W, H);
-}
-
-function show(id) {
-  document.getElementById(id).classList.remove('hidden');
-}
-
-function startPixelReveal() {
-  /* Espera a que las imágenes estén listas por si acaso */
-  Promise.all([
-    img1.complete ? Promise.resolve() : new Promise(r => { img1.onload = r; img1.onerror = r; }),
-    img2.complete ? Promise.resolve() : new Promise(r => { img2.onload = r; img2.onerror = r; })
-  ]).then(() => {
-    const c1 = document.getElementById('c1');
-    const c2 = document.getElementById('c2');
-
-    /* Bloques: muy pixelado → nítido */
-    const stages = [40, 20, 10, 5, 3, 2, 1];
-    const delays  = [0, 300, 600, 950, 1350, 1900, 2800];
-
-    /* — Destino 1: Coliseo — */
-    stages.forEach((bs, i) => {
-      setTimeout(() => renderPixelated(c1, img1, bs), delays[i]);
-    });
-
-    /* — Destino 2: Albania (arranca tras revelar el 1) — */
-    setTimeout(() => {
-      show('dest1');
-      show('co1');
-      show('lbl2');
-      show('c2wrap');
-
-      stages.forEach((bs, i) => {
-        setTimeout(() => renderPixelated(c2, img2, bs), i * 300);
-      });
-    }, 3300);
-
-    setTimeout(() => { show('dest2'); show('co2'); }, 6200);
-    setTimeout(() => show('final-msg'), 7000);
-  });
+function showClue(){
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s3').classList.add('active');
 }
 </script>
 </body>
 </html>
-
-
