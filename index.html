@@ -47,7 +47,6 @@
     pointer-events: none;
   }
   .doc-title { font-size: 11px; color: #00ff4199; margin-bottom: 4px; }
-  .doc-val { font-size: 14px; color: #00ff41; }
   .blink { animation: blink 1s step-end infinite; }
   @keyframes blink { 50% { opacity: 0; } }
   .scan-line {
@@ -150,7 +149,7 @@
     <div class="stamp">CLASIFICADO</div>
     <div class="doc-header">
       <div class="doc-title">OPERACIONES ESPECIALES</div>
-      <div class="doc-val" style="font-size:11px;margin-bottom:8px">EXPEDIENTE #2025-BDAY-██</div>
+      <div style="font-size:11px;color:#00ff41;margin-bottom:8px">EXPEDIENTE #2025-BDAY-██</div>
       <div class="scan-line"></div>
       <div class="field-row">
         <span class="field-label">DESTINATARIO:</span>
@@ -193,14 +192,14 @@
 
     <div class="img-label">DESTINO #01 — COORDENADAS: 41°54'N 12°29'E</div>
     <div class="img-container">
-      <img src="./1.jpg" style="width:200px;border:2px solid red;>
+      <canvas id="c1" class="pixel-canvas"></canvas>
     </div>
     <div class="destination-name hidden" id="dest1">ROMA, ITALIA</div>
     <div class="coords hidden" id="co1">El Coliseo · Construido 70–80 d.C. · MISIÓN CONFIRMADA</div>
 
     <div class="img-label hidden" id="lbl2">DESTINO #02 — COORDENADAS: 41°19'N 19°49'E</div>
     <div class="img-container hidden" id="c2wrap">
-      <img src="./2.jpg" style="width:200px;border:2px solid red;>
+      <canvas id="c2" class="pixel-canvas"></canvas>
     </div>
     <div class="destination-name hidden" id="dest2">ALBANIA</div>
     <div class="coords hidden" id="co2">Riviera Albanesa · Mar Jónico · MISIÓN CONFIRMADA</div>
@@ -216,19 +215,28 @@
 </div>
 
 <script>
+/* ── PRECARGAR IMÁGENES ─────────────────────────────── */
+const img1 = new Image();
+const img2 = new Image();
+img1.crossOrigin = 'anonymous';
+img2.crossOrigin = 'anonymous';
+img1.src = './1.jpg';
+img2.src = './2.jpg';
+
+/* ── QUIZ ───────────────────────────────────────────── */
 const questions = [
   {
-    q: "Para verificar tu identidad, agente: ¿Cuando conoció a J.D.C.H",
+    q: "Para verificar tu identidad, agente: ¿Cuándo conociste a J.D.C.H?",
     opts: ["02/2024", "02/2021", "02/2023", "01/2021"],
     correct: 1
   },
   {
-    q: "Segunda verificación: ¿Cuál es su color favorito, agente?",
+    q: "Segunda verificación: ¿Cuál es tu color favorito, agente?",
     opts: ["Azul", "Rosa", "Morado", "Negro"],
     correct: 1
   },
   {
-    q: "Verificación final: ¿Que marca es el vehículo del agente?",
+    q: "Verificación final: ¿Qué marca es tu vehículo?",
     opts: ["Renault", "Volkswagen", "Fiat", "Nissan"],
     correct: 3
   }
@@ -276,11 +284,8 @@ function answer(idx) {
 }
 
 function next() {
-  if (current < questions.length) {
-    renderQuestion();
-  } else {
-    showReveal();
-  }
+  if (current < questions.length) renderQuestion();
+  else showReveal();
 }
 
 function showReveal() {
@@ -289,56 +294,67 @@ function showReveal() {
   setTimeout(startPixelReveal, 400);
 }
 
-function revealImg(id, delay) {
-  setTimeout(() => {
-    document.getElementById(id).style.filter = "blur(0px)";
-    document.getElementById(id).style.opacity = "1";
-  }, delay);
-}
+/* ── PIXEL REVEAL con imágenes reales ──────────────── */
+const W = 320, H = 180;
 
-function drawColosseum(ctx, W, H) {
-  ctx.fillStyle = '#87CEEB';
-  ctx.fillRect(0, 0, W, H * 0.32);
-  ctx.fillStyle = '#C8A96E';
-  ctx.fillRect(W * 0.1, H * 0.2, W * 0.8, H * 0.72);
-  ctx.fillStyle = '#A07840';
-  for (let i = 0; i < 9; i++) {
-    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.24, W * 0.038, H * 0.18);
-    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.46, W * 0.038, H * 0.18);
-    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.67, W * 0.038, H * 0.14);
-  }
-  ctx.fillStyle = '#6B8F5E';
-  ctx.fillRect(0, H * 0.9, W, H * 0.1);
-}
+function renderPixelated(canvas, img, blockSize) {
+  canvas.width  = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
 
-function drawAlbania(ctx, W, H) {
-  ctx.fillStyle = '#1565C0';
-  ctx.fillRect(0, 0, W, H * 0.58);
-  ctx.fillStyle = '#42A5F5';
-  for (let i = 0; i < 5; i++) {
-    ctx.fillRect(i * W * 0.22, H * 0.5, W * 0.15, 6);
-  }
-  ctx.fillStyle = '#4CAF50';
-  ctx.beginPath();
-  ctx.moveTo(0, H * 0.55);
-  ctx.quadraticCurveTo(W * 0.25, H * 0.35, W * 0.5, H * 0.5);
-  ctx.quadraticCurveTo(W * 0.75, H * 0.62, W, H * 0.45);
-  ctx.lineTo(W, H); ctx.lineTo(0, H);
-  ctx.fill();
-  ctx.fillStyle = '#388E3C';
-  ctx.beginPath();
-  ctx.moveTo(0, H * 0.65);
-  ctx.quadraticCurveTo(W * 0.3, H * 0.5, W * 0.6, H * 0.6);
-  ctx.quadraticCurveTo(W * 0.8, H * 0.68, W, H * 0.58);
-  ctx.lineTo(W, H); ctx.lineTo(0, H);
-  ctx.fill();
+  /* Dibujamos la imagen en un canvas auxiliar pequeño y luego la escalamos */
+  const tmp = document.createElement('canvas');
+  const cols = Math.ceil(W / blockSize);
+  const rows = Math.ceil(H / blockSize);
+  tmp.width  = cols;
+  tmp.height = rows;
+  const tCtx = tmp.getContext('2d');
+  tCtx.drawImage(img, 0, 0, cols, rows);
+
+  /* Escalamos de vuelta con pixelado */
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(tmp, 0, 0, cols, rows, 0, 0, W, H);
 }
 
 function show(id) {
   document.getElementById(id).classList.remove('hidden');
 }
 
+function startPixelReveal() {
+  /* Espera a que las imágenes estén listas por si acaso */
+  Promise.all([
+    img1.complete ? Promise.resolve() : new Promise(r => { img1.onload = r; img1.onerror = r; }),
+    img2.complete ? Promise.resolve() : new Promise(r => { img2.onload = r; img2.onerror = r; })
+  ]).then(() => {
+    const c1 = document.getElementById('c1');
+    const c2 = document.getElementById('c2');
 
+    /* Bloques: muy pixelado → nítido */
+    const stages = [40, 20, 10, 5, 3, 2, 1];
+    const delays  = [0, 300, 600, 950, 1350, 1900, 2800];
+
+    /* — Destino 1: Coliseo — */
+    stages.forEach((bs, i) => {
+      setTimeout(() => renderPixelated(c1, img1, bs), delays[i]);
+    });
+
+    /* — Destino 2: Albania (arranca tras revelar el 1) — */
+    setTimeout(() => {
+      show('dest1');
+      show('co1');
+      show('lbl2');
+      show('c2wrap');
+
+      stages.forEach((bs, i) => {
+        setTimeout(() => renderPixelated(c2, img2, bs), i * 300);
+      });
+    }, 3300);
+
+    setTimeout(() => { show('dest2'); show('co2'); }, 6200);
+    setTimeout(() => show('final-msg'), 7000);
+  });
+}
 </script>
 </body>
 </html>
+
