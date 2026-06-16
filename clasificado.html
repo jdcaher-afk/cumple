@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>EXPEDIENTE CLASIFICADO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #0a0a0a; min-height: 100vh; }
+  #app {
+    background: #0a0a0a;
+    min-height: 100vh;
+    font-family: 'Share Tech Mono', monospace;
+    color: #00ff41;
+    overflow-x: hidden;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .screen { display: none; padding: 1.5rem 1.2rem; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  .stamp {
+    border: 3px solid #ff0000;
+    color: #ff0000;
+    font-size: 22px;
+    font-weight: 900;
+    text-align: center;
+    padding: 6px 12px;
+    letter-spacing: 6px;
+    transform: rotate(-8deg);
+    margin: 0 auto 1.5rem;
+    width: fit-content;
+    opacity: 0.9;
+  }
+  .doc-header {
+    border: 1px solid #00ff41;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .doc-header::before {
+    content: '';
+    position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px solid #00ff4133;
+    pointer-events: none;
+  }
+  .doc-title { font-size: 11px; color: #00ff4199; margin-bottom: 4px; }
+  .doc-val { font-size: 14px; color: #00ff41; }
+  .blink { animation: blink 1s step-end infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .scan-line {
+    width: 100%; height: 2px;
+    background: linear-gradient(to right, transparent, #00ff4155, #00ff41, #00ff4155, transparent);
+    animation: scan 2s linear infinite;
+    margin: 1rem 0;
+  }
+  @keyframes scan { 0%{opacity:0.3} 50%{opacity:1} 100%{opacity:0.3} }
+  .btn-primary {
+    background: transparent;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    padding: 14px 20px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 1rem;
+    letter-spacing: 2px;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn-primary:active { background: #00ff4122; }
+  .field-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 12px; }
+  .field-label { color: #00ff4166; }
+  .field-val { color: #00ff41; }
+  .redacted { background: #00ff41; color: #00ff41; padding: 0 4px; user-select: none; }
+
+  .mission-tag {
+    font-size: 10px; color: #ff000099; border: 1px solid #ff000044;
+    padding: 2px 8px; display: inline-block; margin-bottom: 1rem;
+    letter-spacing: 3px;
+  }
+  .question-box {
+    border: 1px solid #00ff4144;
+    padding: 1rem;
+    margin: 1rem 0;
+    background: #00ff410a;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #00ff41cc;
+  }
+  .question-num { color: #ff0000; font-size: 11px; margin-bottom: 8px; letter-spacing: 2px; }
+  .option {
+    display: block; width: 100%;
+    background: transparent; border: 1px solid #00ff4133;
+    color: #00ff4199; font-family: 'Share Tech Mono', monospace;
+    font-size: 12px; padding: 12px 14px; margin: 8px 0;
+    cursor: pointer; text-align: left; transition: all 0.2s;
+    letter-spacing: 1px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .option:active { background: #00ff410f; }
+  .option.correct { border-color: #00ff41; background: #00ff4122; color: #00ff41; }
+  .option.wrong { border-color: #ff0000; background: #ff000022; color: #ff000099; }
+  .progress-bar { height: 2px; background: #00ff4122; margin: 1rem 0; }
+  .progress-fill { height: 100%; background: #00ff41; transition: width 0.5s; }
+
+  #reveal-screen { background: #000; }
+  .reveal-header { font-size: 11px; color: #ff0000; letter-spacing: 3px; margin-bottom: 1rem; }
+  .img-container {
+    width: 100%; aspect-ratio: 16/9;
+    position: relative; overflow: hidden;
+    border: 1px solid #00ff4133;
+    margin: 0.5rem 0;
+    background: #111;
+  }
+  canvas.pixel-canvas { width: 100%; height: 100%; image-rendering: pixelated; display: block; }
+  .img-label { font-size: 10px; color: #00ff4166; letter-spacing: 2px; margin-bottom: 4px; margin-top: 1rem; }
+  .destination-name {
+    font-size: 22px; color: #00ff41;
+    letter-spacing: 4px; margin: 0.4rem 0;
+    animation: glitch 3s infinite;
+  }
+  @keyframes glitch {
+    0%,90%,100%{text-shadow:none}
+    92%{text-shadow:2px 0 #ff0000,-2px 0 #0000ff}
+    94%{text-shadow:-2px 0 #ff0000,2px 0 #0000ff}
+    96%{text-shadow:none}
+  }
+  .coords { font-size: 11px; color: #00ff4166; margin-bottom: 0.5rem; }
+  .final-msg {
+    border: 1px solid #ff0000;
+    padding: 1.2rem; margin: 1.5rem 0 2rem;
+    font-size: 13px; color: #ff0000;
+    line-height: 1.8; text-align: center;
+    animation: borderPulse 2s ease-in-out infinite;
+  }
+  @keyframes borderPulse { 50% { border-color: #ff000044; color: #ff000099; } }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- PANTALLA 1: INTRO -->
+  <div id="screen-intro" class="screen active">
+    <br>
+    <div class="stamp">CLASIFICADO</div>
+    <div class="doc-header">
+      <div class="doc-title">AGENCIA DE OPERACIONES ESPECIALES</div>
+      <div class="doc-val" style="font-size:11px;margin-bottom:8px">EXPEDIENTE #2025-BDAY-██</div>
+      <div class="scan-line"></div>
+      <div class="field-row">
+        <span class="field-label">DESTINATARIO:</span>
+        <span class="field-val">AGENTE ████████</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">CLASIFICACIÓN:</span>
+        <span class="field-val">ULTRA SECRETO</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">MISIÓN:</span>
+        <span class="field-val">CUMPLEAÑOS 🎂</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">ESTADO:</span>
+        <span class="field-val blink">█ ACTIVO</span>
+      </div>
+      <div class="field-row">
+        <span class="field-label">PATROCINADOR:</span>
+        <span class="field-val"><span class="redacted">DANI</span> (DESCLASIF.)</span>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#00ff4166;line-height:1.8;border-left:2px solid #00ff4133;padding-left:10px;margin-bottom:1.2rem">
+      Este expediente contiene información sobre dos misiones de alto impacto programadas para el verano de 2025. La información ha sido cifrada por razones de seguridad.<br><br>
+      Para acceder al contenido <span style="color:#ff0000">CLASIFICADO</span>, el agente deberá superar la verificación de identidad.
+    </div>
+    <button class="btn-primary" onclick="showQuiz()">► INICIAR VERIFICACIÓN</button>
+  </div>
+
+  <!-- PANTALLA 2: QUIZ -->
+  <div id="screen-quiz" class="screen">
+    <div class="mission-tag">VERIFICACIÓN DE IDENTIDAD</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+    <div id="quiz-content"></div>
+  </div>
+
+  <!-- PANTALLA 3: REVEAL -->
+  <div id="reveal-screen" class="screen">
+    <div class="reveal-header blink">▓ ACCESO CONCEDIDO — DESCIFRANDO...</div>
+
+    <div class="img-label">DESTINO #01 — COORDENADAS: 41°54'N 12°29'E</div>
+    <div class="img-container">
+      <canvas id="c1" class="pixel-canvas"></canvas>
+    </div>
+    <div class="destination-name hidden" id="dest1">ROMA, ITALIA</div>
+    <div class="coords hidden" id="co1">El Coliseo · Construido 70–80 d.C. · MISIÓN CONFIRMADA</div>
+
+    <div class="img-label hidden" id="lbl2">DESTINO #02 — COORDENADAS: 41°19'N 19°49'E</div>
+    <div class="img-container hidden" id="c2wrap">
+      <canvas id="c2" class="pixel-canvas"></canvas>
+    </div>
+    <div class="destination-name hidden" id="dest2">ALBANIA</div>
+    <div class="coords hidden" id="co2">Riviera Albanesa · Mar Jónico · MISIÓN CONFIRMADA</div>
+
+    <div class="final-msg hidden" id="final-msg">
+      ✦ FELIZ CUMPLEAÑOS ✦<br><br>
+      Este verano nos espera una aventura.<br>
+      Dos destinos. Un mismo equipo.<br><br>
+      <span style="color:#00ff41">Con todo mi amor 💚</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Para verificar tu identidad, agente: ¿En qué ciudad está la Fontana di Trevi?",
+    opts: ["Milán", "Roma", "Nápoles", "Florencia"],
+    correct: 1
+  },
+  {
+    q: "Segunda verificación: Albania linda con el Mar Adriático y el Mar...",
+    opts: ["Mediterráneo", "Negro", "Jónico", "Egeo"],
+    correct: 2
+  },
+  {
+    q: "Verificación final: ¿Cuántos destinos secretos contiene este expediente?",
+    opts: ["Uno", "Dos", "Tres", "Cuatro"],
+    correct: 1
+  }
+];
+
+let current = 0;
+let answered = false;
+
+function showQuiz() {
+  document.getElementById('screen-intro').classList.remove('active');
+  document.getElementById('screen-quiz').classList.add('active');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = (current / questions.length) * 100;
+  document.getElementById('progress').style.width = pct + '%';
+  answered = false;
+  document.getElementById('quiz-content').innerHTML = `
+    <div class="question-box">
+      <div class="question-num">PREGUNTA ${current + 1} / ${questions.length}</div>
+      <div style="margin-bottom:14px">${q.q}</div>
+      ${q.opts.map((o, i) => `<button class="option" onclick="answer(${i})">[${String.fromCharCode(65+i)}] ${o}</button>`).join('')}
+    </div>
+    <div id="feedback" style="font-size:12px;min-height:24px;margin-top:6px;color:#00ff4199"></div>
+  `;
+}
+
+function answer(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[current];
+  const btns = document.querySelectorAll('.option');
+  if (idx === q.correct) {
+    btns[idx].classList.add('correct');
+    document.getElementById('feedback').innerHTML = '<span style="color:#00ff41">✓ VERIFICADO</span>';
+    setTimeout(() => { current++; next(); }, 900);
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.correct].classList.add('correct');
+    document.getElementById('feedback').innerHTML = '<span style="color:#ff0000">✗ ERROR — Respuesta correcta marcada</span>';
+    setTimeout(() => { current++; next(); }, 1500);
+  }
+}
+
+function next() {
+  if (current < questions.length) {
+    renderQuestion();
+  } else {
+    showReveal();
+  }
+}
+
+function showReveal() {
+  document.getElementById('screen-quiz').classList.remove('active');
+  document.getElementById('reveal-screen').classList.add('active');
+  setTimeout(startPixelReveal, 400);
+}
+
+function drawPixelated(canvasId, blockSize, detailFn) {
+  const canvas = document.getElementById(canvasId);
+  const W = 320, H = 180;
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  for (let y = 0; y < H; y += blockSize) {
+    for (let x = 0; x < W; x += blockSize) {
+      const l = 30 + Math.random() * 50;
+      const s = 20 + Math.random() * 40;
+      ctx.fillStyle = `hsl(40,${s}%,${l}%)`;
+      ctx.fillRect(x, y, blockSize, blockSize);
+    }
+  }
+  if (blockSize <= 4 && detailFn) detailFn(ctx, W, H);
+}
+
+function drawColosseum(ctx, W, H) {
+  ctx.fillStyle = '#87CEEB';
+  ctx.fillRect(0, 0, W, H * 0.32);
+  ctx.fillStyle = '#C8A96E';
+  ctx.fillRect(W * 0.1, H * 0.2, W * 0.8, H * 0.72);
+  ctx.fillStyle = '#A07840';
+  for (let i = 0; i < 9; i++) {
+    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.24, W * 0.038, H * 0.18);
+    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.46, W * 0.038, H * 0.18);
+    ctx.fillRect(W * 0.12 + i * (W * 0.086), H * 0.67, W * 0.038, H * 0.14);
+  }
+  ctx.fillStyle = '#6B8F5E';
+  ctx.fillRect(0, H * 0.9, W, H * 0.1);
+}
+
+function drawAlbania(ctx, W, H) {
+  ctx.fillStyle = '#1565C0';
+  ctx.fillRect(0, 0, W, H * 0.58);
+  ctx.fillStyle = '#42A5F5';
+  for (let i = 0; i < 5; i++) {
+    ctx.fillRect(i * W * 0.22, H * 0.5, W * 0.15, 6);
+  }
+  ctx.fillStyle = '#4CAF50';
+  ctx.beginPath();
+  ctx.moveTo(0, H * 0.55);
+  ctx.quadraticCurveTo(W * 0.25, H * 0.35, W * 0.5, H * 0.5);
+  ctx.quadraticCurveTo(W * 0.75, H * 0.62, W, H * 0.45);
+  ctx.lineTo(W, H); ctx.lineTo(0, H);
+  ctx.fill();
+  ctx.fillStyle = '#388E3C';
+  ctx.beginPath();
+  ctx.moveTo(0, H * 0.65);
+  ctx.quadraticCurveTo(W * 0.3, H * 0.5, W * 0.6, H * 0.6);
+  ctx.quadraticCurveTo(W * 0.8, H * 0.68, W, H * 0.58);
+  ctx.lineTo(W, H); ctx.lineTo(0, H);
+  ctx.fill();
+}
+
+function show(id) {
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function startPixelReveal() {
+  const stages = [64, 32, 16, 8, 4, 2, 1];
+  const delays = [0, 250, 500, 750, 1050, 1600, 2600];
+
+  stages.forEach((bs, i) => {
+    setTimeout(() => drawPixelated('c1', bs, drawColosseum), delays[i]);
+  });
+
+  setTimeout(() => {
+    show('dest1');
+    show('co1');
+    show('lbl2');
+    show('c2wrap');
+    stages.forEach((bs, i) => {
+      setTimeout(() => drawPixelated('c2', bs, drawAlbania), i * 280);
+    });
+  }, 3200);
+
+  setTimeout(() => { show('dest2'); show('co2'); }, 6000);
+  setTimeout(() => show('final-msg'), 6700);
+}
+</script>
+</body>
+</html>
