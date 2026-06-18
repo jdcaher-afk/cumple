@@ -3,191 +3,561 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Para Elisabeth</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Feliz Cumpleaños, Eli 🎂</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{min-height:100vh;background:#0d0d0d}
-  #app{min-height:100vh;background:#0d0d0d;font-family:'Montserrat',sans-serif;color:#e8dcc8;overflow-x:hidden;max-width:480px;margin:0 auto}
-  .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;padding:2rem 1.4rem}
-  .screen.active{display:flex}
-  .gold-line{width:60px;height:1px;background:#c9a84c;margin:1rem auto}
-  .gold-line-full{width:100%;height:1px;background:linear-gradient(to right,transparent,#c9a84c,transparent);margin:1.2rem 0}
-  .blink{animation:pulse 2s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:0.4}50%{opacity:1}}
-  .fade-in{animation:fadeIn 0.8s ease forwards}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-  .hidden{display:none}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* SOBRE */
-  .envelope-wrap{width:100%;max-width:320px;margin:2rem auto;cursor:pointer}
-  .envelope-body{background:#1a1410;border:1px solid #c9a84c44;padding:2rem 1.5rem 1.5rem;position:relative;text-align:center}
-  .envelope-body::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:160px solid transparent;border-right:160px solid transparent;border-top:90px solid #0d0d0d;transition:border-top-color 0.5s}
-  .envelope-body.open::before{border-top-color:#1a1410}
-  .wax-seal{width:52px;height:52px;border-radius:50%;background:#8B0000;border:2px solid #c9a84c;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;color:#c9a84c;margin:0.5rem auto 1.5rem;position:relative;z-index:2;box-shadow:0 0 0 4px #1a1410;transition:transform 0.3s}
-  .envelope-body:hover .wax-seal{transform:scale(1.08)}
-  .env-label{font-size:10px;letter-spacing:3px;color:#c9a84c99;text-transform:uppercase;margin-bottom:0.5rem}
-  .env-name{font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:#e8dcc8;line-height:1.2}
+  :root {
+    --cream: #FAF7F2;
+    --warm-dark: #1C1410;
+    --accent: #C4773B;
+    --accent-light: #F0D8C0;
+    --text: #2E2018;
+    --muted: #8C7B6E;
+    --serif: 'Playfair Display', Georgia, serif;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
 
-  /* QUIZ */
-  .quiz-header{text-align:center;margin-bottom:1.5rem;width:100%}
-  .quiz-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-style:italic;color:#e8dcc8;margin-bottom:0.3rem}
-  .quiz-sub{font-size:10px;letter-spacing:3px;color:#c9a84c;text-transform:uppercase}
-  .progress-dots{display:flex;gap:8px;justify-content:center;margin:1rem 0}
-  .dot{width:6px;height:6px;border-radius:50%;background:#c9a84c22;border:1px solid #c9a84c44;transition:all 0.4s}
-  .dot.done{background:#c9a84c}
-  .q-card{width:100%;background:#1a1410;border:1px solid #c9a84c33;padding:1.5rem;margin:0.5rem 0}
-  .q-num{font-size:10px;letter-spacing:3px;color:#c9a84c88;margin-bottom:0.8rem;text-transform:uppercase}
-  .q-text{font-family:'Cormorant Garamond',serif;font-size:20px;font-style:italic;color:#e8dcc8;line-height:1.5;margin-bottom:1.2rem}
-  .opt{display:block;width:100%;background:transparent;border:1px solid #c9a84c22;color:#c9a84c88;font-family:'Montserrat',sans-serif;font-size:11px;padding:12px 16px;margin:6px 0;cursor:pointer;text-align:left;letter-spacing:1px;text-transform:uppercase;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
-  .opt:active,.opt:hover{border-color:#c9a84c66;color:#e8dcc8}
-  .opt.correct{border-color:#c9a84c;background:#c9a84c11;color:#c9a84c}
-  .opt.wrong{border-color:#8B000066;background:#8B000011;color:#8B000099}
-  .feedback{font-size:11px;letter-spacing:2px;min-height:20px;margin-top:8px;text-align:center}
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
-  /* PISTA */
-  .clue-card{width:100%;background:#1a1410;border:1px solid #c9a84c44;padding:2rem 1.5rem;text-align:center;margin-top:1rem}
-  .clue-icon{font-size:32px;margin-bottom:1rem}
-  .clue-label{font-size:9px;letter-spacing:4px;color:#c9a84c;text-transform:uppercase;margin-bottom:1rem}
-  .clue-coords{font-family:'Cormorant Garamond',serif;font-size:28px;color:#e8dcc8;letter-spacing:4px;margin:0.8rem 0}
-  .clue-hint{font-family:'Cormorant Garamond',serif;font-size:16px;font-style:italic;color:#c9a84c88;line-height:1.6;margin:0.8rem 0 1.2rem}
-  .maps-btn{display:block;width:100%;background:transparent;border:1px solid #c9a84c;color:#c9a84c;font-family:'Montserrat',sans-serif;font-size:11px;padding:14px 20px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;text-decoration:none;text-align:center;margin-top:0.5rem;-webkit-tap-highlight-color:transparent}
-  .maps-btn:active{background:#c9a84c11}
+  body {
+    background: var(--cream);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* ── PÁGINA 1: FELICITACIÓN ── */
+  #page-birthday {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(2rem, 6vw, 3rem) clamp(1.25rem, 5vw, 2rem) clamp(3rem, 8vw, 4rem);
+    max-width: 560px;
+    margin: 0 auto;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    text-align: center;
+  }
+
+  h1 {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 10vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.15;
+    text-align: center;
+    color: var(--warm-dark);
+    margin-bottom: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  h1 em { font-style: italic; color: var(--accent); }
+
+  .photo-frame {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: clamp(8px, 3vw, 12px);
+    overflow: hidden;
+    position: relative;
+    margin-bottom: clamp(1.5rem, 5vw, 2rem);
+    box-shadow: 0 2px 24px rgba(28,20,16,0.10);
+  }
+
+  .photo-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #E8D5C0 0%, #D4B896 50%, #C4A07A 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .photo-placeholder span { font-size: clamp(36px, 10vw, 48px); }
+  .photo-placeholder p { font-size: 13px; color: #7A5C3E; font-family: var(--sans); }
+
+  .divider {
+    width: 40px;
+    height: 1px;
+    background: var(--accent-light);
+    margin: 0 auto 1.75rem;
+  }
+
+  .dedication {
+    font-family: var(--serif);
+    font-size: clamp(1rem, 4vw, 1.1rem);
+    line-height: 1.8;
+    color: var(--text);
+    text-align: center;
+    font-weight: 400;
+  }
+
+  .dedication p + p { margin-top: 1rem; }
+  .dedication em { color: var(--accent); font-style: italic; }
+
+  .fade-out {
+    position: relative;
+    margin-top: 1.5rem;
+  }
+
+  .fade-out::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--cream));
+    pointer-events: none;
+  }
+
+  .btn-more {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 2rem auto 0;
+    padding: clamp(0.8rem, 3vw, 0.85rem) clamp(1.5rem, 6vw, 2rem);
+    background: var(--warm-dark);
+    color: var(--cream);
+    border: none;
+    border-radius: 100px;
+    font-family: var(--sans);
+    font-size: clamp(14px, 4vw, 15px);
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.2s, transform 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    min-height: 48px;
+  }
+
+  .btn-more:hover { background: #2E2018; transform: translateY(-1px); }
+  .btn-more:active { transform: scale(0.97); }
+
+  .btn-more svg {
+    width: 16px; height: 16px;
+    stroke: currentColor; fill: none;
+    stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+  }
+
+  /* ── PÁGINA 2: REVEAL ── */
+  #page-reveal {
+    display: none;
+    min-height: 100vh;
+    min-height: 100dvh;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: clamp(2rem, 6vw, 3rem) clamp(1.25rem, 5vw, 1.5rem) clamp(3rem, 8vw, 4rem);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  #page-reveal.visible {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #page-reveal.fadein { opacity: 1; }
+
+  .sorry-line {
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+    text-align: center;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.01em;
+  }
+
+  .reveal-title {
+    font-family: var(--serif);
+    font-size: clamp(1.7rem, 8vw, 2.8rem);
+    font-weight: 600;
+    text-align: center;
+    color: var(--warm-dark);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+  }
+
+  .reveal-subtitle {
+    font-family: var(--serif);
+    font-size: clamp(1rem, 4vw, 1.1rem);
+    font-style: italic;
+    color: var(--accent);
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  /* ── SUSPENSE ── */
+  #suspense-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 50vh;
+    width: 100%;
+    gap: clamp(1.5rem, 5vw, 2.5rem);
+  }
+
+  .suspense-text {
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 5vw, 1.4rem);
+    font-style: italic;
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.7;
+    max-width: 300px;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .suspense-text.show { opacity: 1; transform: translateY(0); }
+
+  .countdown-ring {
+    position: relative;
+    width: clamp(80px, 22vw, 96px);
+    height: clamp(80px, 22vw, 96px);
+  }
+
+  .countdown-ring svg {
+    transform: rotate(-90deg);
+    width: 100%; height: 100%;
+  }
+
+  .countdown-ring circle.track {
+    fill: none;
+    stroke: var(--accent-light);
+    stroke-width: 3;
+  }
+
+  .countdown-ring circle.progress {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-dasharray: 251.2;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  .countdown-number {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: clamp(1.6rem, 6vw, 2rem);
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  /* ── DESTINOS ── */
+  #destinations-block {
+    width: 100%;
+    display: none;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.9s ease, transform 0.9s ease;
+  }
+
+  #destinations-block.show {
+    opacity: 1;
+    transform: translateY(0);
+    display: block;
+  }
+
+  .destinations {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(0.75rem, 3vw, 1rem);
+    width: 100%;
+    margin-bottom: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  /* En móvil, una debajo de la otra y más altas */
+  @media (max-width: 480px) {
+    .destinations {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .dest-card {
+      aspect-ratio: 16/10 !important;
+      border-radius: 14px !important;
+    }
+
+    .dest-label strong { font-size: 1.4rem !important; }
+    .dest-label small { font-size: 12px !important; }
+    .dest-label { padding: 2rem 1.25rem 1.25rem !important; }
+  }
+
+  .dest-card {
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+    aspect-ratio: 2/3;
+    box-shadow: 0 4px 24px rgba(28,20,16,0.14);
+  }
+
+  .dest-card img {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+    transition: transform 0.6s ease;
+  }
+
+  .dest-card:active img { transform: scale(1.03); }
+
+  .dest-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .dest-placeholder.roma {
+    background: linear-gradient(160deg, #C4773B 0%, #8B4513 100%);
+  }
+
+  .dest-placeholder.albania {
+    background: linear-gradient(160deg, #1A6B9A 0%, #0D4F7A 60%, #1A8A6B 100%);
+  }
+
+  .dest-placeholder span { font-size: clamp(36px, 10vw, 48px); }
+  .dest-placeholder p { font-size: 12px; color: rgba(255,255,255,0.7); font-family: var(--sans); }
+
+  .dest-label {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 2rem 1rem 1rem;
+    background: linear-gradient(to top, rgba(20,10,5,0.88) 0%, transparent 100%);
+    color: white;
+  }
+
+  .dest-label strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: clamp(1.1rem, 4vw, 1.3rem);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .dest-label small {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 400;
+    opacity: 0.75;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .closing {
+    font-family: var(--serif);
+    font-size: clamp(1rem, 4vw, 1.1rem);
+    line-height: 1.9;
+    color: var(--muted);
+    text-align: center;
+    font-style: italic;
+    width: 100%;
+  }
+
+  .signature {
+    margin-top: 1.5rem;
+    font-family: var(--serif);
+    font-size: clamp(1.2rem, 5vw, 1.4rem);
+    color: var(--accent);
+    font-style: italic;
+    text-align: center;
+  }
 </style>
 </head>
 <body>
-<div id="app">
 
-  <!-- PANTALLA 1: SOBRE -->
-  <div id="s1" class="screen active">
-    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;width:100%">
-      <p style="font-size:9px;letter-spacing:4px;color:#c9a84c88;text-transform:uppercase;margin-bottom:2rem">Una sorpresa para</p>
-      <div class="envelope-wrap" onclick="openEnvelope()">
-        <div class="envelope-body" id="env">
-          <div class="wax-seal">✦</div>
-          <div class="env-label">Para</div>
-          <div class="env-name">Elisabeth</div>
-          <div class="gold-line"></div>
-          <div style="font-size:10px;color:#c9a84c66;letter-spacing:1px">Con amor, Dani</div>
-          <div class="blink" style="font-size:10px;color:#c9a84c55;letter-spacing:2px;margin-top:1.5rem">✦ toca para abrir ✦</div>
+<!-- PÁGINA 1: FELICITACIÓN -->
+<div id="page-birthday">
+  <p class="eyebrow">Para ti, hoy</p>
+
+  <h1>Feliz cumpleaños,<br><em>Eli</em></h1>
+
+  <div class="photo-frame">
+    <!-- Reemplaza este bloque por: <img src="TU_FOTO.jpg" alt="Nosotros"> -->
+    <div class="photo-placeholder">
+      <span>📸</span>
+      <p>Aquí va vuestra foto</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="dedication fade-out">
+    <p>
+      Hay personas que llegan a tu vida y la reorganizan por completo,
+      sin pedirte permiso, sin avisar.
+      Tú eres una de esas personas.
+    </p>
+    <p>
+      Este año ha sido diferente porque tú has estado en él.
+      Y quería que lo supieras de una forma
+      que no se pudiera olvidar fácilmente...
+    </p>
+  </div>
+
+  <button class="btn-more" onclick="revealSurprise()">
+    Seguir leyendo
+    <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+  </button>
+</div>
+
+<!-- PÁGINA 2: REVEAL -->
+<div id="page-reveal">
+
+  <p class="sorry-line">Lo siento mucho, Eli.</p>
+  <h2 class="reveal-title">No era una dedicatoria.</h2>
+  <p class="reveal-subtitle">Era algo bastante mejor.</p>
+
+  <!-- Suspense: texto + anillo -->
+  <div id="suspense-block">
+    <p class="suspense-text" id="suspense-text">
+      Tienes que esperar<br>un momento...
+    </p>
+    <div class="countdown-ring">
+      <svg viewBox="0 0 80 80">
+        <circle class="track" cx="40" cy="40" r="34"/>
+        <circle class="progress" id="ring-progress" cx="40" cy="40" r="34"/>
+      </svg>
+      <div class="countdown-number" id="countdown-num">15</div>
+    </div>
+  </div>
+
+  <!-- Destinos: ocultos hasta el final del countdown -->
+  <div id="destinations-block">
+    <div class="destinations">
+
+      <div class="dest-card">
+        <!-- <img src="roma.jpg" alt="Roma"> -->
+        <div class="dest-placeholder roma">
+          <span>🏛️</span>
+          <p>foto de Roma</p>
+        </div>
+        <div class="dest-label">
+          <small>Italia</small>
+          <strong>Roma</strong>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- PANTALLA 2: QUIZ -->
-  <div id="s2" class="screen">
-    <div class="quiz-header">
-      <div class="gold-line"></div>
-      <div class="quiz-title">¿Nos conocemos?</div>
-      <div class="quiz-sub">Tres preguntas para ti</div>
-      <div class="gold-line"></div>
-      <div class="progress-dots">
-        <div class="dot" id="d0"></div>
-        <div class="dot" id="d1"></div>
-        <div class="dot" id="d2"></div>
+      <div class="dest-card">
+        <!-- <img src="albania.jpg" alt="Riviera Albanesa"> -->
+        <div class="dest-placeholder albania">
+          <span>🌊</span>
+          <p>foto de Albania</p>
+        </div>
+        <div class="dest-label">
+          <small>Albania</small>
+          <strong>Riviera<br>Albanesa</strong>
+        </div>
       </div>
-    </div>
-    <div id="qcontent" style="width:100%"></div>
-  </div>
 
-  <!-- PANTALLA 3: PISTA -->
-  <div id="s3" class="screen">
-    <div style="width:100%;text-align:center;margin-bottom:0.5rem">
-      <div class="gold-line"></div>
-      <div style="font-family:'Cormorant Garamond',serif;font-size:13px;letter-spacing:4px;color:#c9a84c;text-transform:uppercase">Misión superada</div>
-      <div class="gold-line"></div>
     </div>
 
-    <div class="clue-card fade-in">
-      <div class="clue-label">Ahora busca el siguiente QR</div>
-      <div class="gold-line-full"></div>
+    <p class="closing">
+      Abre el sobre.<br>
+      Ya están los billetes dentro.
+    </p>
 
-      <!-- ════════════════════════════════════
-           CAMBIA AQUÍ LAS COORDENADAS
-           Formato: GG°MM'SS.S"N GG°MM'SS.S"W
-           ════════════════════════════════════ -->
-      <div class="clue-coords" id="coords-display">28°27'46"N 16°15'16"W</div>
-
-      <div class="gold-line-full"></div>
-
-      <!-- ════════════════════════════════════
-           CAMBIA AQUÍ EL TEXTO DE LA PISTA
-           ════════════════════════════════════ -->
-      <div class="clue-hint">"Donde los dos nos perdemos<br>entre páginas y café"</div>
-
-      <!-- ════════════════════════════════════
-           CAMBIA AQUÍ LAS COORDENADAS DEL ENLACE
-           Formato: latitud,longitud decimales
-           Ej: 28.4628,-16.2544
-           ════════════════════════════════════ -->
-      <a class="maps-btn" href="https://maps.apple.com/?ll=28.4628,-16.2544&q=Siguiente+QR" target="_blank">
-        ✦ abrir en maps ✦
-      </a>
-    </div>
-
-    <div style="font-size:10px;color:#c9a84c44;letter-spacing:2px;text-align:center;margin-top:1.5rem">
-      El siguiente QR te espera ahí
-    </div>
+    <p class="signature">Con todo, Dani ♡</p>
   </div>
 
 </div>
+
 <script>
-const questions=[
-  /* ════════════════════════════════════════════════
-     CAMBIA AQUÍ LAS PREGUNTAS, OPCIONES Y correct:
-     correct es el índice (0=A, 1=B, 2=C, 3=D)
-     ════════════════════════════════════════════════ */
-  {q:"¿Cuándo nos conocimos?", opts:["02/2024","02/2021","02/2023","01/2021"], correct:1},
-  {q:"¿Cuál es tu color favorito?", opts:["Azul","Rosa","Morado","Negro"], correct:1},
-  {q:"¿Qué marca es tu coche?", opts:["Renault","Volkswagen","Fiat","Nissan"], correct:3}
-];
+  function revealSurprise() {
+    const p1 = document.getElementById('page-birthday');
+    const p2 = document.getElementById('page-reveal');
 
-let cur=0, answered=false;
+    p1.style.opacity = '0';
+    p1.style.transition = 'opacity 0.5s ease';
 
-function openEnvelope(){
-  document.getElementById('env').classList.add('open');
-  setTimeout(()=>{
-    document.getElementById('s1').classList.remove('active');
-    document.getElementById('s2').classList.add('active');
-    renderQ();
-  },600);
-}
+    setTimeout(() => {
+      p1.style.display = 'none';
+      p2.classList.add('visible');
+      window.scrollTo({ top: 0, behavior: 'instant' });
 
-function renderQ(){
-  const q=questions[cur];
-  answered=false;
-  for(let i=0;i<3;i++) document.getElementById('d'+i).classList.toggle('done',i<cur);
-  document.getElementById('qcontent').innerHTML=`
-    <div class="q-card fade-in">
-      <div class="q-num">Pregunta ${cur+1} de ${questions.length}</div>
-      <div class="q-text">${q.q}</div>
-      ${q.opts.map((o,i)=>`<button class="opt" onclick="pick(${i})">${o}</button>`).join('')}
-      <div class="feedback" id="fb"></div>
-    </div>`;
-}
-
-function pick(idx){
-  if(answered)return;
-  answered=true;
-  const q=questions[cur];
-  const btns=document.querySelectorAll('.opt');
-  if(idx===q.correct){
-    btns[idx].classList.add('correct');
-    document.getElementById('fb').innerHTML='<span style="color:#c9a84c;letter-spacing:2px">✦ correcto</span>';
-    setTimeout(()=>{cur++;cur<questions.length?renderQ():showClue();},900);
-  } else {
-    btns[idx].classList.add('wrong');
-    btns[q.correct].classList.add('correct');
-    document.getElementById('fb').innerHTML='<span style="color:#8B000099;letter-spacing:2px">— así es</span>';
-    setTimeout(()=>{cur++;cur<questions.length?renderQ():showClue();},1500);
+      setTimeout(() => {
+        p2.classList.add('fadein');
+        startSuspense();
+      }, 80);
+    }, 500);
   }
-}
 
-function showClue(){
-  document.getElementById('s2').classList.remove('active');
-  document.getElementById('s3').classList.add('active');
-}
+  function startSuspense() {
+    const suspenseText = document.getElementById('suspense-text');
+    const numEl        = document.getElementById('countdown-num');
+    const ring         = document.getElementById('ring-progress');
+    const suspenseBlock = document.getElementById('suspense-block');
+    const destBlock    = document.getElementById('destinations-block');
+
+    const TOTAL = 15;
+    const circumference = 2 * Math.PI * 34; // r=34 → ~213.6
+    ring.style.strokeDasharray  = circumference;
+    ring.style.strokeDashoffset = '0';
+
+    let seconds = TOTAL;
+
+    setTimeout(() => suspenseText.classList.add('show'), 200);
+
+    const tick = () => {
+      numEl.textContent = seconds;
+      const filled = (TOTAL - seconds) / TOTAL;
+      ring.style.strokeDashoffset = circumference * filled;
+
+      if (seconds <= 0) {
+        suspenseBlock.style.opacity    = '0';
+        suspenseBlock.style.transition = 'opacity 0.6s ease';
+        setTimeout(() => {
+          suspenseBlock.style.display = 'none';
+          destBlock.style.display     = 'block';
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => destBlock.classList.add('show'));
+          });
+        }, 600);
+        return;
+      }
+
+      seconds--;
+      setTimeout(tick, 1000);
+    };
+
+    setTimeout(tick, 400);
+  }
 </script>
+
 </body>
 </html>
+
